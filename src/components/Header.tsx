@@ -18,20 +18,20 @@ function HeaderContent() {
   const {data: session } = useSession();
   return (
     <div className="relative flex items-center w-full h-full px-6 text-white">
-      {/* 타이틀 (왼쪽) */}
+      {/* 타이틀 */}
       <h1
         onClick={()=>router.push('/')}
         className="text-lg font-bold cursor-pointer flex items-center gap-2">
-        <FaPlayCircle className="text-red-500 text-2xl" /> {/* 아이콘 적용 */}
+        <FaPlayCircle className="text-red-500 text-2xl" />
         StreamNest
       </h1>
 
-      {/* 검색바 (가운데 정렬) */}
+      {/* 검색바 */}
       <div className="absolute left-1/2 transform -translate-x-1/2">
         <Searchbar />
       </div>
 
-      {/* 로그인 버튼 (오른쪽) */}
+      {/* 로그인 버튼 */}
       {session ? (
           <button
             onClick={() => signOut()}

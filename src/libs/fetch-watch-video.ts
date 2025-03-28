@@ -1,31 +1,30 @@
-import { getBestThumbnail } from "@/utils/youtube";
-import { fetchChannelProfiles } from "./fetch-chnnel-profile"; // ✅ 모듈화한 채널 프로필 API import
+import { headers } from "next/headers";
 
-export async function fetchYouTubeVideoById(videoId: string) {
-  const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY as string;
-  const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${API_KEY}`;
+export async function fetchWatchVideo(videoId: string) {
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+  const host = (await headers()).get("host"); // ✅ 서버에서 헤더 통해 호스트 추출
 
-  const response = await fetch(url);
-  const data = await response.json();
+  try {
+    const res = await fetch(
+      `${protocol}://${host}/api/youtube/watch?videoId=${videoId}`
+    );
 
-  if (!data.items || data.items.length === 0) return null;
+    if (!res.ok) {
+      console.error("API 응답 실패:", res.status);
+      return null;
+    }
 
-  const video = data.items[0];
+    const data = await res.json();
 
-  // ✅ 개별 영상의 채널 ID 가져오기
-  const channelId = video.snippet.channelId;
+    // 응답이 null인 경우 처리
+    if (data === null) {
+      console.warn("영상 데이터를 찾을 수 없습니다.");
+      return null;
+    }
 
-  // ✅ 채널 프로필 가져오기
-  const channelProfiles = await fetchChannelProfiles([channelId], API_KEY);
-
-  return {
-    videoId: video.id,
-    title: video.snippet.title,
-    thumbnail: getBestThumbnail(video.snippet.thumbnails),
-    channelName: video.snippet.channelTitle,
-    viewCount: video.statistics.viewCount || "0",
-    likeCount: video.statistics.likeCount || "0", // ✅ 좋아요 수 추가
-    channelProfile: channelProfiles[channelId] || "https://via.placeholder.com/50x50",
-    publishedAt: video.snippet.publishedAt,
-  };
+    return data;
+  } catch (error) {
+    console.error("fetchWatchVideo 오류:", error);
+    return null;
+  }
 }

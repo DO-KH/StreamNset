@@ -1,78 +1,37 @@
-import { getBestThumbnail } from "@/utils/youtube";
-import { fetchChannelProfiles } from "./fetch-chnnel-profile";
-import { YouTubeVideoItem } from "@/types/youtube";
+import { YouTubeVideoResponse } from "@/types/youtube";
 
-interface VideoDetails {
-  viewCount: string;
-  publishedAt: string;
-  channelId: string;
-}
+export async function fetchLikedVideos(
+  accessToken: string,
+  pageToken?: string
+): Promise<YouTubeVideoResponse> {
+  let url = "";
 
-export async function fetchLikedVideos(accessToken: string) {
-  const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY as string;
-
-  console.log("📌 Fetching Liked Videos...");
-
-  // 1️⃣ 좋아요한 영상 목록 가져오기 (영상 ID 포함)
-  const likedVideosUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&myRating=like&maxResults=20&key=${API_KEY}`;
-  const likedVideosResponse = await fetch(likedVideosUrl, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: "application/json",
-    },
-  });
-
-  const likedVideosData = await likedVideosResponse.json();
-
-  if (!likedVideosData.items) {
-    console.error("❌ Error: No liked videos found");
-    return [];
+  if (typeof window === "undefined") {
+    // 서버
+    const { headers } = await import("next/headers");
+    const host = (await headers()).get("host");
+    const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+    url = `${protocol}://${host}/api/youtube/liked?accessToken=${accessToken}${
+      pageToken ? `&pageToken=${pageToken}` : ""
+    }`;
+  } else {
+    // 클라이언트
+    const host = window.location.host;
+    const protocol = window.location.protocol;
+    url = `${protocol}//${host}/api/youtube/liked?accessToken=${accessToken}${
+      pageToken ? `&pageToken=${pageToken}` : ""
+    }`;
   }
 
-  // 2️⃣ videoId, 채널 ID 목록 추출
-  const videoDetails: Record<
-    string,
-    { viewCount: string; publishedAt: string; channelId: string }
-  > = {};
+  try {
+    const res = await fetch(url, { next: { revalidate: 60 } });
 
-  const channelIds: string[] = Array.from(
-    new Set(
-      likedVideosData.items
-        .map((video: YouTubeVideoItem) => video.snippet.channelId)
-        .filter((id: string): id is string => typeof id === "string")
-    )
-  );
+    if (!res.ok) throw new Error("🔥 YouTube API 요청 실패");
 
-  likedVideosData.items.forEach((video: YouTubeVideoItem) => {
-    videoDetails[video.id] = {
-      viewCount: video.statistics?.viewCount || "0",
-      publishedAt: video.snippet.publishedAt,
-      channelId: video.snippet.channelId,
-    };
-  });
-
-  // 3️⃣ 채널 프로필 가져오기
-  const channelProfiles = await fetchChannelProfiles(channelIds, API_KEY);
-
-  // 4️⃣ 최종 데이터 반환
-  return likedVideosData.items.map((video: YouTubeVideoItem) => {
-    const videoId = video.id;
-    const details: VideoDetails = videoDetails[videoId] || {
-      viewCount: "0",
-      publishedAt: "",
-      channelId: "",
-    };
-
-    return {
-      videoId,
-      title: video.snippet.title,
-      thumbnail: getBestThumbnail(video.snippet.thumbnails),
-      channelName: video.snippet.channelTitle,
-      viewCount: details.viewCount,
-      publishedAt: details.publishedAt,
-      channelProfile:
-        channelProfiles[details.channelId] || "https://via.placeholder.com/50x50",
-    };
-  });
+    const { videos, nextPageToken } = await res.json();
+    return { videos, nextPageToken };
+  } catch (e) {
+    console.error("영상을 불러오는데 실패했습니다.", e);
+    return { videos: [], nextPageToken: null };
+  }
 }
-

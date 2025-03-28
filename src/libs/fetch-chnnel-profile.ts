@@ -21,9 +21,8 @@ export async function fetchChannelProfiles(channelIds: string[], apiKey: string)
 
   if (!data.items) return {};
 
-  console.log("📌 채널 프로필 응답 데이터:", data);
 
-  // ✅ 채널 ID를 키로, 프로필 URL을 값으로 저장
+  // 채널 ID를 키로, 프로필 URL을 값으로 저장
   const profiles: Record<string, string> = {};
   data.items.forEach((channel: ChannelItem) => {
     profiles[channel.id] = channel.snippet.thumbnails.default?.url || "https://via.placeholder.com/50x50";

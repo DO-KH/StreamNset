@@ -10,7 +10,7 @@ export const authOptions: NextAuthOptions = {
         url: "https://accounts.google.com/o/oauth2/auth",
         params: {
           scope: "openid email profile https://www.googleapis.com/auth/youtube.readonly",
-          response_type: "code", // ✅ 기존의 `id_token token` 대신 `code` 사용
+          response_type: "code",
           access_type: "offline", // ✅ refresh token 요청 가능
           prompt: "consent", // ✅ 매번 동의 화면 표시
         },
@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, account }) {
       if (account) {
         token.accessToken = account.access_token;
-        token.idToken = account.id_token; // ✅ `id_token` 저장
+        token.idToken = account.id_token;
       }
       return token;
     },

@@ -25,3 +25,9 @@ export interface YouTubeVideo {
   channelProfile: string;
   publishedAt: string;
 }
+
+export interface YouTubeVideoResponse {
+  videos: YouTubeVideo[];
+  nextPageToken: string | null;
+  accessToken?: string;
+}

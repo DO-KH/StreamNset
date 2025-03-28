@@ -2,11 +2,11 @@ import MainContents from "../components/MainContents";
 import { fetchYouTubeVideos } from "../libs/fetch-youtube-videos";
 
 export default async function Home() {
-  const videos = await fetchYouTubeVideos();
+  const initialvideos = await fetchYouTubeVideos();
 
   return (
     <div>
-      <MainContents videos={videos} /> 
+      <MainContents initialvideos={initialvideos} /> 
     </div>
   );
 }

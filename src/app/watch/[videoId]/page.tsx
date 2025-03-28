@@ -1,8 +1,6 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { fetchYouTubeVideoById } from "../../libs/fetch-watch-video";
+import { fetchWatchVideo } from "@/libs/fetch-watch-video";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { FaThumbsUp, FaEye } from "react-icons/fa"; // ✅ 아이콘 추가
 import { FaClock } from "react-icons/fa6";
 
@@ -17,31 +15,47 @@ interface YouTubeVideo {
   publishedAt: string;
 }
 
-export default function WatchPage() {
-  const searchParams = useSearchParams();
-  const videoId = searchParams.get("v");
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ videoId: string }>;
+}): Promise<Metadata> {
+  const { videoId } = await params;
+  const video = await fetchWatchVideo(videoId);
 
-  const [video, setVideo] = useState<YouTubeVideo | null>(null);
-  const [loading, setLoading] = useState(true);
+  if (!video) {
+    return {
+      title: "영상을 찾을 수 없습니다",
+    };
+  }
 
-  useEffect(() => {
-    if (!videoId) return;
+  return {
+    title: `${video.title} - StreamNest`,
+    description: `${video.channelName}의 영상입니다. 조회수 ${video.viewCount}회`,
+    openGraph: {
+      title: video.title,
+      description: `${video.channelName}의 인기 영상`,
+      images: [video.thumbnail],
+      type: "video.other",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: video.title,
+      description: `${video.channelName}의 인기 영상`,
+      images: [video.thumbnail],
+    },
+  };
+}
 
-    setLoading(true);
-    fetchYouTubeVideoById(videoId)
-      .then((data) => {
-        setVideo(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("❌ 영상 데이터를 불러오는 중 오류 발생:", error);
-        setLoading(false);
-      });
-  }, [videoId]);
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ videoId: string }>;
+}) {
+  const { videoId } = await params;
+  const video: YouTubeVideo = await fetchWatchVideo(videoId);
 
-  if (!videoId) return <div className="text-white text-center mt-10">📌 영상이 없습니다.</div>;
-  if (loading) return <div className="text-white text-center mt-10">⏳ 로딩 중...</div>;
-  if (!video) return <div className="text-white text-center mt-10">❌ 영상을 찾을 수 없습니다.</div>;
+  if (!video) return notFound();
 
   return (
     <div className="flex flex-col items-center bg-[#0F0F0F] min-h-screen p-8 text-white">

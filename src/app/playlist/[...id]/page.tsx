@@ -2,9 +2,10 @@ import MainContents from "@/components/MainContents";
 import { fetchPlaylistVideos } from "@/libs/fetch-playlist-videos";
 import { playlists } from "@/libs/playlists";
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page(context: { params: { id: string | string[] } }) {
+  const {params} = context
   const playlistId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const videos = await fetchPlaylistVideos(playlistId);
+  const initialvideos = await fetchPlaylistVideos(playlistId);
   const playlist = playlists.find((p) => p.id === playlistId);
 
   return (
@@ -18,7 +19,7 @@ export default async function Page({ params }: { params: { id: string } }) {
 
       {/* ✅ 메인 컨텐츠 영역 */}
       <div className="max-w-7xl mx-auto px-6">
-        <MainContents videos={videos} />
+        <MainContents initialvideos={initialvideos} />
       </div>
     </div>
   );
