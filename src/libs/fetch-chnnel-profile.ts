@@ -23,10 +23,8 @@ export async function fetchChannelProfiles(channelIds: string[], apiKey: string)
 
 
   // 채널 ID를 키로, 프로필 URL을 값으로 저장
-  const profiles: Record<string, string> = {};
-  data.items.forEach((channel: ChannelItem) => {
-    profiles[channel.id] = channel.snippet.thumbnails.default?.url || "https://via.placeholder.com/50x50";
-  });
-
-  return profiles;
+  return data.items.reduce((acc: Record<string, string>, channel: ChannelItem) => {
+    acc[channel.id] = channel.snippet.thumbnails.default?.url || "https://via.placeholder.com/50x50";
+    return acc;
+  }, {});
 }

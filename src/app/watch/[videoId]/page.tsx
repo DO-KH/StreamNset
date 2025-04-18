@@ -70,14 +70,14 @@ export default async function Page({
       {/* ℹ️ 영상 정보 섹션 */}
       <div className="w-full max-w-4xl mt-8 px-6">
         {/* 🎬 영상 제목 */}
-        <h1 className="text-3xl font-bold">{video.title}</h1>
+        <h1 className="text-xl font-bold">{video.title}</h1>
 
         {/* 📌 채널 정보 */}
         <div className="flex items-center mt-6 border-b border-gray-700 pb-4">
           <img
             src={video.channelProfile}
             alt={video.channelName}
-            className="w-14 h-14 rounded-full mr-4"
+            className="w-10 h-10 rounded-full mr-4"
           />
           <div>
             <p className="text-xl font-semibold">{video.channelName}</p>

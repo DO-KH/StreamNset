@@ -1,6 +1,6 @@
 # StreamNest
 
-Google Cloud의 YouTube Data Api v3 통해 실제 Youtube 영상을 제공하는 스트리밍 사이트입니다.
+Google Cloud의 YouTube Data Api v3 통해 Youtube 영상을 제공하는 스트리밍 사이트입니다.
 
 ---
 
@@ -42,9 +42,3 @@ Google Cloud의 YouTube Data Api v3 통해 실제 Youtube 영상을 제공하는
 ## 무한스크롤 구현
  - 초기 페이지 렌더링시 영상 데이터와 함께 가져온 PageToken을 이용하여 fetch함수의 매개변수로 전달
  - 모든 페이지는 각자 렌더링 전략에 따라 동작하지만 스크롤을 이용한 영상 로드 시 CSR로 동작
-
-
-🔥 메인 페이지 (한국 인기 영상)	CSR (useEffect로 API 요청)	✅ ISR로 캐싱 적용
-🎭 카테고리별 페이지	CSR (useEffect로 API 요청)	✅ ISR로 캐싱 적용
-🔎 검색 결과 페이지	CSR (useEffect로 API 요청)	✅ SSR로 SEO 최적화
-❤️ 좋아요한 영상 페이지	CSR (useEffect로 API 요청)	✅ SSR로 보안 강화 (OAuth 필요)

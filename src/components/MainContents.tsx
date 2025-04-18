@@ -5,7 +5,7 @@ import Image from "next/image";
 import { YouTubeVideo, YouTubeVideoResponse } from "@/types/youtube";
 import { formatRelativeTime } from "@/utils/dateUtils";
 import { formatViewCount } from "@/utils/formatUtils";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchYouTubeVideos } from "@/libs/fetch-youtube-videos";
 
 export default function MainContents({
@@ -17,6 +17,19 @@ export default function MainContents({
   const [nextPageToken, setNextPageToken] = useState<string | null>(initialvideos.nextPageToken);
   const [loading, setLoading] = useState(false);
   const loaderRef = useRef<HTMLDivElement | null>(null);
+
+  const loadMore = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetchYouTubeVideos(nextPageToken!);
+      setVideos((prev) => [...prev, ...res.videos]);
+      setNextPageToken(res.nextPageToken);
+    } catch (err) {
+      console.error("더보기 실패", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [nextPageToken]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -30,20 +43,9 @@ export default function MainContents({
 
     if (loaderRef.current) observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [nextPageToken, loading]);
+  }, [loadMore, loading, nextPageToken]);
 
-  const loadMore = async () => {
-    setLoading(true);
-    try {
-      const res = await fetchYouTubeVideos(nextPageToken!);
-      setVideos((prev) => [...prev, ...res.videos]);
-      setNextPageToken(res.nextPageToken);
-    } catch (err) {
-      console.error("더보기 실패", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-[#0f0f0f] text-white p-6">

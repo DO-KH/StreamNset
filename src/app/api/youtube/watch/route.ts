@@ -17,10 +17,10 @@ export async function GET(req: NextRequest) {
 
   const video = data.items[0];
 
-  // ✅ 개별 영상의 채널 ID 가져오기
+  // 개별 영상의 채널 ID
   const channelId = video.snippet.channelId;
 
-  // ✅ 채널 프로필 가져오기
+  // 채널 프로필 가져오기
   const channelProfiles = await fetchChannelProfiles([channelId], API_KEY);
 
   const watchVideo =  {

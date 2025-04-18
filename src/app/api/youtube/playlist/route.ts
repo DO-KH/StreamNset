@@ -41,21 +41,21 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // 2️⃣ videoId 목록 추출
+  // videoId 목록 추출
   const videoIds = playlistData.items.map(
     (item: PlaylistItem) => item.snippet.resourceId.videoId
   );
 
-  // 3️⃣ videos API를 사용해 조회수 및 추가 정보 가져오기
+  // videos API를 사용해 조회수 및 추가 정보 가져오기
   const videosUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoIds.join(
     ","
   )}&key=${API_KEY}`;
   const videosResponse = await fetch(videosUrl);
   const videosData = await videosResponse.json();
 
-  console.log("📊 Videos API Response:", videosData);
+  console.log("Videos API Response:", videosData);
 
-  // 4️⃣ 조회수, 업로드 날짜 및 채널 ID 데이터를 매핑
+  // 조회수, 업로드 날짜 및 채널 ID 데이터를 매핑
   const videoDetails: Record<
     string,
     { viewCount: string; publishedAt: string; channelId: string }
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  // 5️⃣ 채널 ID 목록 추출 (`undefined` 값 제거)
+  // 채널 ID 목록 추출 (`undefined` 값 제거)
   const channelIds: string[] = Array.from(
     new Set( // set을 통해 반환된 값의 타입은
       videosData.items
@@ -78,10 +78,9 @@ export async function GET(req: NextRequest) {
     )
   );
 
-  // 6️⃣ 채널 프로필 가져오기
+  // 채널 프로필 가져오기
   const channelProfiles = await fetchChannelProfiles(channelIds, API_KEY);
 
-  // 7️⃣ 최종 데이터 반환 (채널 프로필 및 업로드 날짜 포함)
   const playlists = playlistData.items.map((item: PlaylistItem) => {
     const videoId = item.snippet.resourceId.videoId;
     const details = videoDetails[videoId] || {

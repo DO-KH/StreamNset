@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/libs/authOptions";
 import { fetchLikedVideos } from "@/libs/fetch-liked-videos";
 import MainContents from "@/components/MainContents";
 

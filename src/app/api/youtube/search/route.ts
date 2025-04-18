@@ -23,7 +23,7 @@ export interface SearchItem {
 export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get("query");
   const pageToken = req.nextUrl.searchParams.get("pageToken") ?? "";
-  if (!query) return [];
+  if (!query) return NextResponse.json([], { status: 200 });
 
   const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 
