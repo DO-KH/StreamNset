@@ -26,7 +26,7 @@ export async function fetchLikedVideos(
   try {
     const res = await fetch(url, { next: { revalidate: 60 } });
 
-    if (!res.ok) throw new Error("🔥 YouTube API 요청 실패");
+    if (!res.ok) throw new Error("YouTube API 요청 실패");
 
     const { videos, nextPageToken } = await res.json();
     return { videos, nextPageToken };

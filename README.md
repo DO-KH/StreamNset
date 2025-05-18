@@ -42,3 +42,9 @@ Google Cloud의 YouTube Data Api v3 통해 Youtube 영상을 제공하는 스트
 ## 무한스크롤 구현
  - 초기 페이지 렌더링시 영상 데이터와 함께 가져온 PageToken을 이용하여 fetch함수의 매개변수로 전달
  - 모든 페이지는 각자 렌더링 전략에 따라 동작하지만 스크롤을 이용한 영상 로드 시 CSR로 동작
+
+## 로그인 토큰 관리
+ - oauth를 통해 받은 토큰은 외부 api 접근용임
+ - next-auth의 callbacks를 통해 jwt형태로 저장, session 형태로 클라이언트에게 넘김(쿠키)
+ - 리프레시 토큰은 별도로 oauth에 요청해야함
+ - next-auth가 없었다면? 백엔드에서 별도로 토큰을 가지고 있어야 함
