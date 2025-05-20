@@ -14,7 +14,9 @@ export default function MainContents({
   initialvideos: YouTubeVideoResponse;
 }) {
   const [videos, setVideos] = useState(initialvideos.videos);
-  const [nextPageToken, setNextPageToken] = useState<string | null>(initialvideos.nextPageToken);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(
+    initialvideos.nextPageToken
+  );
   const [loading, setLoading] = useState(false);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -22,7 +24,16 @@ export default function MainContents({
     setLoading(true);
     try {
       const res = await fetchYouTubeVideos(nextPageToken!);
-      setVideos((prev) => [...prev, ...res.videos]);
+
+      // 중복 요청 방지
+      setVideos((prev) => {
+        const existingIds = new Set(prev.map((v) => v.videoId));
+        const uniqueNewVideos = res.videos.filter(
+          (v) => !existingIds.has(v.videoId)
+        );
+        return [...prev, ...uniqueNewVideos];
+      });
+
       setNextPageToken(res.nextPageToken);
     } catch (err) {
       console.error("더보기 실패", err);
@@ -44,8 +55,6 @@ export default function MainContents({
     if (loaderRef.current) observer.observe(loaderRef.current);
     return () => observer.disconnect();
   }, [loadMore, loading, nextPageToken]);
-
-  
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-[#0f0f0f] text-white p-6">

@@ -3,19 +3,21 @@
 import { formatViewCount } from "@/utils/formatUtils";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { YouTubeVideoResponse } from "@/types/youtube";
+import { YouTubeVideo, YouTubeVideoResponse } from "@/types/youtube";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchSearchResults } from "@/libs/fetch-search-result";
 
 export default function SearchResults({
   initialResult,
   query,
+  filter,
 }: {
   initialResult: YouTubeVideoResponse;
   query: string;
+  filter: "relevance" | "viewCount" | "date"
 }) {
-  const [videos, setVideos] = useState(initialResult.videos);
-  const [nextPageToken, setNextPageToken] = useState(
+  const [videos, setVideos] = useState<YouTubeVideo[]>(initialResult.videos);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(
     initialResult.nextPageToken
   );
   const loaderRef = useRef(null);
@@ -24,7 +26,7 @@ export default function SearchResults({
   const loadMore = useCallback(async () => {
     if (!nextPageToken) return;
 
-    const res = await fetchSearchResults(query, nextPageToken);
+    const res = await fetchSearchResults(query, nextPageToken, filter);
     if (!res) return;
 
     const newVideos = res.videos.filter(
@@ -33,7 +35,7 @@ export default function SearchResults({
 
     setVideos((prev) => [...prev, ...newVideos]);
     setNextPageToken(res.nextPageToken);
-  }, [query, nextPageToken, videos]); // 의존성 정확히 설정
+  }, [query, nextPageToken, videos, filter]); // 의존성 정확히 설정
 
   useEffect(() => {
     const observer = new IntersectionObserver(

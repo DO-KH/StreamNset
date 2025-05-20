@@ -23,12 +23,13 @@ export interface SearchItem {
 export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get("query");
   const pageToken = req.nextUrl.searchParams.get("pageToken") ?? "";
+  const order = req.nextUrl.searchParams.get("order") ?? "relevance";
   if (!query) return NextResponse.json([], { status: 200 });
 
   const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 
-  // 1️⃣ 🔍 검색 API 호출 (영상 ID 및 기본 정보 가져오기)
-  const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&maxResults=20&type=video&key=${API_KEY}${pageToken ? `&pageToken=${pageToken}` : ""}`;
+  // 검색 API 호출 (영상 ID 및 기본 정보 가져오기)
+  const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&maxResults=20&type=video&order=${order}&key=${API_KEY}${pageToken ? `&pageToken=${pageToken}` : ""}`;
   const searchResponse = await fetch(searchUrl);
   const searchData = await searchResponse.json();
 

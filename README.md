@@ -39,6 +39,9 @@ Google Cloud의 YouTube Data Api v3 통해 Youtube 영상을 제공하는 스트
  - search : 검색어 기반 영상 데이터 가져옴
  - like : videos api + 헤더(accessToken)
 
+## 검색 결과 페이지
+ - 필터 상태를 URL 쿼리 파라미터에 반영해서 공유 가능하게 만듦(new URLSearchParams)
+
 ## 무한스크롤 구현
  - 초기 페이지 렌더링시 영상 데이터와 함께 가져온 PageToken을 이용하여 fetch함수의 매개변수로 전달
  - 모든 페이지는 각자 렌더링 전략에 따라 동작하지만 스크롤을 이용한 영상 로드 시 CSR로 동작

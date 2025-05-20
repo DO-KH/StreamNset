@@ -2,10 +2,11 @@ import { YouTubeVideoResponse } from "@/types/youtube";
 
 export async function fetchSearchResults(
   query: string,
-  pageToken?: string
+  pageToken?: string,
+  order: string = "relevance"
 ): Promise<YouTubeVideoResponse | null> {
   try {
-    const url = `/api/youtube/search?query=${encodeURIComponent(query)}${
+    const url = `/api/youtube/search?query=${encodeURIComponent(query)}&order=${order}${
       pageToken ? `&pageToken=${pageToken}` : ""
     }`;
 
